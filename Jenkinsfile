@@ -10,10 +10,10 @@ pipeline {
         stage('Packaging/Pushing imagae') {
 
             steps {
-                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                    sh 'docker build -t tannv95/springbooDemo .'
-                    sh 'docker push tannv95/springbooDemo'
-                }
+               withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+                   sh 'docker build -t tannv95/springbooDemo .'
+                   sh 'docker push  tannv95/springbooDemo'
+               }
             }
         }
 
