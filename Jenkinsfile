@@ -12,14 +12,13 @@ pipeline {
     stages {
 
         stage('Packaging/Pushing images') {
-
-                    steps {
-                        withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-                            sh 'docker build -t tannv95/dockerdemo .'
-                            sh 'docker push tannv95/dockerdemo'
-                        }
+            steps {
+                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+                    sh 'docker build -t tannv95/dockerdemo .'
+                    sh 'docker push tannv95/dockerdemo'
                     }
                 }
+        }
 
 
         stage('Deploy MySQL to DEV') {
