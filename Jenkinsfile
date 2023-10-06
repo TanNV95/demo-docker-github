@@ -13,8 +13,6 @@ pipeline {
 
 
     stages {
-
-    stages {
          stage('Get MySQL Credentials') {
                      steps {
                          script {
