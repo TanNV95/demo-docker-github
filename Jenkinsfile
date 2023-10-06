@@ -6,10 +6,25 @@ pipeline {
             maven 'my-maven'
         }
 
-    environment {
-        MYSQL_ROOT_LOGIN = credentials('mysql-root-login')
-    }
+     environment {
+                MYSQL_ROOT_USERNAME = ''
+                MYSQL_ROOT_PASSWORD = ''
+        }
+
+
     stages {
+
+    stages {
+         stage('Get MySQL Credentials') {
+                     steps {
+                         script {
+                             withCredentials([usernamePassword(credentialsId: 'mysql-root-login', usernameVariable: 'MYSQL_ROOT_USERNAME', passwordVariable: 'MYSQL_ROOT_PASSWORD')]) {
+                                 // Do something with MYSQL_ROOT_USERNAME and MYSQL_ROOT_PASSWORD
+                             }
+                         }
+                     }
+                 }
+
 
         stage('Packaging/Pushing images') {
             steps {
@@ -30,21 +45,21 @@ pipeline {
                 sh 'echo y | docker container prune '
                 sh 'docker volume rm tannv-mysql-data || echo "no volume"'
 
-                sh "docker run --name tannv-mysql --rm --network dev -v tannv-mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_LOGIN_PSW} -e MYSQL_DATABASE=db_example  -d mysql:8.0 "
+                sh "docker run --name tannv-mysql --rm --network dev -v tannv-mysql-data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=1 -e MYSQL_DATABASE=db_example  -d mysql:8.0"
                 sh 'sleep 20'
-                sh "docker exec -i tannv-mysql mysql --user=root --password=${MYSQL_ROOT_LOGIN_PSW} < script"
+                sh "docker exec -i tannv-mysql mysql --user=root --password=1 < script"
             }
         }
 
         stage('Deploy Spring Boot to DEV') {
             steps {
                 echo 'Deploying and cleaning'
-                sh 'docker image pull tannv95/springbooDemo'
-                sh 'docker container stop tannv95-springbooDemo || echo "this container does not exist" '
+                sh 'docker image pull tannv95/dockerdemo'
+                sh 'docker container stop tannv95-dockerdemo || echo "this container does not exist" '
                 sh 'docker network create dev || echo "this network exists"'
                 sh 'echo y | docker container prune '
 
-                sh 'docker container run -d --rm --name tannv95-springbooDemo -p 8081:8080 --network dev tannv95/springbooDemo'
+                sh 'docker container run -d --rm --name tannv95-dockerdemo -p 8081:8080 --network dev tannv95/dockerdemo'
             }
         }
  
